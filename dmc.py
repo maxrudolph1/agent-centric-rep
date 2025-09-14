@@ -11,7 +11,8 @@ from dm_control import manipulation, suite
 from dm_control.suite.wrappers import action_scale, pixels
 from dm_env import StepType, specs
 
-#from envs.distracting_control.suite import distracting_wrapper
+# from envs.distracting_control.suite import distracting_wrapper
+from distracting_control.suite import load as distracting_load
 #import envs.fb_mtenv_dmc as fb_mtenv_dmc
 
 
@@ -258,12 +259,15 @@ def make(name, frame_stack, action_repeat, seed, distracting_mode: str = None, m
             kwargs = distracting_kwargs_lookup[distracting_mode]
             kwargs['pixels_only'] = True
             kwargs['render_kwargs'] = render_kwargs
-            kwargs['background_dataset_path'] = "DAVIS/JPEGImages/480p/"
-            env = distracting_wrapper(
-                env,
-                domain,
-                **kwargs
-            )
+            kwargs['background_dataset_path'] = "/datastor1/mrudolph/DAVIS/DAVIS/JPEGImages/480p/"
+
+            dynamic = not kwargs.pop('fixed_distraction')
+
+            kwargs['dynamic'] = dynamic
+            kwargs.pop('color_seed', None)
+            kwargs.pop('background_seed', None)
+            kwargs.pop('camera_seed', None)
+            env = distracting_load(domain,task,**kwargs)
         else:
             env = pixels.Wrapper(env,
                                  pixels_only=True,

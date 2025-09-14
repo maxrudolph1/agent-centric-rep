@@ -13,6 +13,9 @@ import os
 
 import matplotlib.pyplot as plt
 
+from afr.models.cnn import CNN
+from omegaconf import OmegaConf
+
 
 class Predictor(nn.Module):
 	def __init__(self, state_dim, action_dim, max_action):
@@ -186,7 +189,7 @@ class ACROAgent:
                  hidden_dim, critic_target_tau, num_expl_steps,
                  update_every_steps, stddev_schedule, stddev_clip, use_tb,
                  offline=False, bc_weight=2.5, augmentation=RandomShiftsAug(pad=4),
-                 use_bc=True, k_embed=False, use_critic_grads=True, max_action=1.0):
+                 use_bc=True, k_embed=False, use_critic_grads=True, max_action=1.0, pretrained_encoder_path=None):
         self.device = device
         self.critic_target_tau = critic_target_tau
         self.update_every_steps = update_every_steps
@@ -201,7 +204,18 @@ class ACROAgent:
         self.use_critic_grads = use_critic_grads
 
         # models
-        self.encoder = Encoder(obs_shape, feature_dim).to(device)
+        # self.encoder = Encoder(obs_shape, feature_dim).to(device)
+        if pretrained_encoder_path is not None:
+            pretrained_config = OmegaConf.load(pretrained_encoder_path + '/config.yaml')
+            state_dict = torch.load(pretrained_encoder_path + '/pla_models.pt')
+
+            encoder_dict = state_dict['encoder']
+
+            self.encoder = CNN(pretrained_config.model.encoder)
+            self.encoder.load_state_dict(encoder_dict)
+        else:
+            self.encoder = Encoder(obs_shape, feature_dim).to(device)
+
         self.decoder = Decoder(obs_shape, feature_dim).to(device)
         self.actor = Actor(feature_dim, action_shape, feature_dim,
                            hidden_dim).to(device)

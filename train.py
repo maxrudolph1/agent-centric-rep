@@ -175,7 +175,7 @@ class Workspace:
         # Open dataset, load as memory buffer
         load_offline_dataset_into_buffer(Path(offline_dir), self.replay_buffer, self.agent, self.cfg.frame_stack,
                                          self.cfg.replay_buffer_size)
-
+        
         if self.replay_buffer.index == -1:
             raise ValueError('No offline data loaded, check directory.')
 
@@ -273,6 +273,7 @@ def main(cfg):
     from train import Workspace as W
     root_dir = Path.cwd()
     workspace = W(cfg)
+    
     print(cfg)
     snapshot = root_dir / 'snapshot.pt'
     if snapshot.exists():

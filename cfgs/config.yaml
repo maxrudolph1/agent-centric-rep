@@ -4,7 +4,9 @@ defaults:
   - algo@_global_: acro
   - override hydra/launcher: submitit_local
 
-dist_level: hard # only used for cleaner log names
+dist_level: easy # only used for cleaner log names
+pretrained_encoder_path: None #/u/mrudolph/documents/afr/artifacts/afr/cheetah/2025-09-14-07-05-40
+offline_dir: /u/mrudolph/documents/acro/vd4rl/cheetah_run/100k
 
 # task settings
 frame_stack: 3
@@ -13,11 +15,11 @@ discount: 0.99
 distracting_mode: null
 # train settings
 num_seed_frames: 4000
-pretrain_num_frames: 30000
+pretrain_num_frames: 0
 # eval
 eval_every_frames: 5000
 num_eval_episodes: 10
-eval_on_distracting: False
+eval_on_distracting: True
 eval_on_multitask: False
 eval_save_vid_every_step: 100000
 # snapshot

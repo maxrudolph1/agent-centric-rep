@@ -15,7 +15,8 @@ Simply use the train.py script to run ACRO/InfoGating. Provide a `task_name`, `o
 
 Run ACRO
 ```
-python train.py task_name=offline_cheetah_run_expert offline_dir=/path/to/dataset/vd4rl/main/cheetah_run/expert/ seed=1 algo=acro dist_level=none
+<!-- python train.py task_name=offline_cheetah_run_expert offline_dir=/u/mrudolph/documents/acro/vd4rl/cheetah_run/100k seed=1 algo=acro dist_level=none -->
+ py train.py offline_dir=/u/mrudolph/documents/acro/vd4rl/cheetah_run/100k task_name=offline_cheetah_run_expert
 ```
 
 Run InfoGating
