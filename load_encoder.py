@@ -16,11 +16,6 @@ state_dict = torch.load(path)
 encoder_dict = state_dict['encoder']
 
 
-
-
-# obs_shape = config['obs_shape']
-# feature_dim = config['feature_dim']
-
 encoder = CNN(config.model.encoder)
 encoder.load_state_dict(encoder_dict)
 

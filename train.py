@@ -22,6 +22,7 @@ import utils
 from logger import Logger
 from numpy_replay_buffer import EfficientReplayBuffer
 from video import TrainVideoRecorder, VideoRecorder
+import time
 from utils import load_offline_dataset_into_buffer
 
 torch.backends.cudnn.benchmark = True
@@ -35,7 +36,7 @@ def make_agent(obs_spec, action_spec, cfg):
 
 class Workspace:
     def __init__(self, cfg):
-        self.work_dir = Path.cwd()
+        self.work_dir = Path.cwd() #/ time.strftime("%Y-%m-%d_%H-%M-%S")
         print(f'workspace: {self.work_dir}')
 
         self.cfg = cfg
@@ -53,6 +54,8 @@ class Workspace:
 
     def setup(self):
         # create logger
+        # self.work_dir = self.work_dir / time.strftime("%Y-%m-%d_%H-%M-%S")
+
         self.logger = Logger(self.work_dir, use_tb=self.cfg.use_tb, offline=self.cfg.offline,
                              distracting_eval=self.cfg.eval_on_distracting, multitask_eval=self.cfg.eval_on_multitask)
         # create envs
@@ -173,20 +176,26 @@ class Workspace:
 
     def train_offline(self, offline_dir):
         # Open dataset, load as memory buffer
+        start_time = time.time()
         load_offline_dataset_into_buffer(Path(offline_dir), self.replay_buffer, self.agent, self.cfg.frame_stack,
                                          self.cfg.replay_buffer_size)
-        
+        end_time = time.time()
+        print(f'Time taken to load offline dataset: {end_time - start_time} seconds')
         if self.replay_buffer.index == -1:
             raise ValueError('No offline data loaded, check directory.')
 
         # predicates
+        start_time = time.time()
         train_until_step = utils.Until(self.cfg.num_train_frames, 1)
         pretrain_until_step = utils.Until(self.cfg.pretrain_num_frames, 1)
+        end_time = time.time()
+        print(f'Time taken to create predicates: {end_time - start_time} seconds')
         eval_every_step = utils.Every(self.cfg.eval_every_frames, 1)
         show_train_stats_every_step = utils.Every(self.cfg.show_train_stats_every_frames, 1)
         # only in distracting evaluation mode
         eval_save_vid_every_step = utils.Every(self.cfg.eval_save_vid_every_step,
                                                self.cfg.action_repeat)
+        
 
         metrics = None
         step = 0
@@ -219,6 +228,7 @@ class Workspace:
                 self._pretrain_step += 1
 
             
+        start_time = time.time()
         while train_until_step(self.global_step):
             if show_train_stats_every_step(self.global_step):
                 # wait until all the metrics schema is populated
@@ -248,6 +258,7 @@ class Workspace:
 
             # try to update the agent
             metrics = self.agent.update(self.replay_buffer, self.global_step)
+
             if show_train_stats_every_step(self.global_step):
                 self.logger.log_metrics(metrics, self.global_frame, ty='train')
 
@@ -271,7 +282,7 @@ class Workspace:
 @hydra.main(config_path='cfgs', config_name='config')
 def main(cfg):
     from train import Workspace as W
-    root_dir = Path.cwd()
+    root_dir = Path.cwd() / time.strftime("%Y-%m-%d_%H-%M-%S")
     workspace = W(cfg)
     
     print(cfg)

@@ -4,7 +4,7 @@ defaults:
 num_train_frames: 1100000
 stddev_schedule: 'linear(1.0, 0.1, 250000)'
 nstep: 1
-show_train_stats_every_frames: 2000
+show_train_stats_every_frames: 10
 lr: 3e-4
 replay_buffer_size: 1_000_000
 offline: True

@@ -5,7 +5,7 @@ defaults:
   - override hydra/launcher: submitit_local
 
 dist_level: easy # only used for cleaner log names
-pretrained_encoder_path: None #/u/mrudolph/documents/afr/artifacts/afr/cheetah/2025-09-14-07-05-40
+pretrained_encoder_path: /u/mrudolph/documents/afr/artifacts/afr/cheetah/2025-09-14-07-05-40
 offline_dir: /u/mrudolph/documents/acro/vd4rl/cheetah_run/100k
 
 # task settings
@@ -19,7 +19,7 @@ pretrain_num_frames: 0
 # eval
 eval_every_frames: 5000
 num_eval_episodes: 10
-eval_on_distracting: True
+eval_on_distracting: False
 eval_on_multitask: False
 eval_save_vid_every_step: 100000
 # snapshot
@@ -54,7 +54,7 @@ lagrange_thresh: 0.0
 
 hydra:
   run:
-     dir: results/${experiment}/${task_name}/${dist_level}_seed-${seed}
+     dir: results/${experiment}/${task_name}/${dist_level}_seed-${seed}/${now:%Y.%m.%d}_${now:%H:%M:%S}
   sweep:
     dir: ./exp/${now:%Y.%m.%d}/${now:%H%M}_${agent_cfg.experiment}
     subdir: ${hydra.job.num}
